@@ -57,7 +57,7 @@ function subscribition(channelId) {
     if (change.operationType === "insert") {
       try {
         const msgDetails = change.fullDocument;
-        console.log(msgDetails);
+        // console.log(msgDetails);
         pusher.trigger(channelId, "inserted", msgDetails);
       } catch (error) {
         console.log(error);
@@ -89,14 +89,14 @@ app.post("/checkOrCreateUser", async (req, res) => {
       memberId: userDetails.memberId,
     });
     if (ifMemberExist.length !== 0) {
-      console.log("member already in");
+      // console.log("member already in");
       memberData = ifMemberExist[0];
       const channelsDetails = await Channels.find({
         channelId: { $in: memberData.channels },
       });
       memberData.channels = channelsDetails;
     } else {
-      console.log("member not already in");
+      // console.log("member not already in");
       memberData = await Members.create(req.body);
     }
     res.status(201);
@@ -120,10 +120,10 @@ app.post("/createOrJoinRoom", async (req, res) => {
       channelId: channelId,
     });
     if (ifRoomExist.length !== 0) {
-      console.log("room already exists");
+      // console.log("room already exists");
       roomData = ifRoomExist[0];
     } else {
-      console.log("room not already exists");
+      // console.log("room not already exists");
       roomData = await Channels.create({
         channelId: channelId,
         channelImageUrl: channelImageUrl,
@@ -146,11 +146,16 @@ app.post("/createOrJoinRoom", async (req, res) => {
 });
 
 app.get("/getMessages", async (req, res) => {
-  const channels = JSON.parse(req.query.channels);
+  try {
+    const channels = JSON.parse(req.query.channels);
   const messages = await Messages.find({ channelId: { $in: channels } });
   // console.log(messages);
   res.status(200);
   res.send(messages);
+  }
+  catch (error) {
+    console.log(error);
+  }
 });
 
 // listen
